@@ -51,10 +51,22 @@ export function FloatingNavbar() {
               Клише
             </button>
             <button
+              onClick={() => scrollToSection("constructor")}
+              className="text-sm font-open-sans-custom text-gray-300 transition-colors hover:text-white [text-shadow:_0_2px_6px_rgb(0_0_0_/_40%)]"
+            >
+              Конструктор
+            </button>
+            <button
+              onClick={() => scrollToSection("examples")}
+              className="text-sm font-open-sans-custom text-gray-300 transition-colors hover:text-white [text-shadow:_0_2px_6px_rgb(0_0_0_/_40%)]"
+            >
+              Примеры
+            </button>
+            <button
               onClick={() => scrollToSection("contact")}
               className="text-sm font-open-sans-custom text-gray-300 transition-colors hover:text-white [text-shadow:_0_2px_6px_rgb(0_0_0_/_40%)]"
             >
-              Советы
+              Ошибки
             </button>
           </div>
 
