@@ -9,14 +9,44 @@ import { EssayConstructor } from "@/components/ui/essay-constructor"
 import { EssayExamples } from "@/components/ui/essay-examples"
 import { EssayMistakes } from "@/components/ui/essay-mistakes"
 import { MailIcon, PhoneIcon, MapPinIcon } from "lucide-react"
+import Icon from "@/components/ui/icon"
 import { cn } from "@/lib/utils"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 
 const TOTAL_SECTIONS = 7
+
+const SECTION_TITLES = [
+  "Введение",
+  "Типы сочинений",
+  "Алгоритм 13.3",
+  "Клише",
+  "Конструктор",
+  "Примеры",
+  "Ошибки",
+]
 
 export default function Index() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<(HTMLElement | null)[]>(Array(TOTAL_SECTIONS).fill(null))
+  const [currentSection, setCurrentSection] = useState(0)
+
+  const goTo = useCallback((index: number) => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    const target = Math.max(0, Math.min(TOTAL_SECTIONS - 1, index))
+    container.scrollTo({ left: target * container.offsetWidth, behavior: "smooth" })
+  }, [])
+
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    const onScroll = () => {
+      const idx = Math.round(container.scrollLeft / container.offsetWidth)
+      setCurrentSection(idx)
+    }
+    container.addEventListener("scroll", onScroll, { passive: true })
+    return () => container.removeEventListener("scroll", onScroll)
+  }, [])
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current
@@ -227,6 +257,59 @@ export default function Index() {
             <EssayMistakes />
           </div>
         </section>
+      </div>
+
+      {/* Навигационные стрелки */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3">
+        <button
+          onClick={() => goTo(currentSection - 1)}
+          disabled={currentSection === 0}
+          className={cn(
+            "flex items-center justify-center w-10 h-10 rounded-full border-2 backdrop-blur-sm transition-all",
+            currentSection === 0
+              ? "border-white/10 bg-white/5 text-white/20 cursor-not-allowed"
+              : "border-white/30 bg-white/10 text-white hover:bg-white/20 hover:border-white/50"
+          )}
+        >
+          <Icon name="ChevronLeft" size={18} />
+        </button>
+
+        {/* Точки-индикаторы */}
+        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+          {SECTION_TITLES.map((title, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              title={title}
+              className={cn(
+                "rounded-full transition-all",
+                currentSection === i
+                  ? "w-5 h-2 bg-white"
+                  : "w-2 h-2 bg-white/30 hover:bg-white/60"
+              )}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={() => goTo(currentSection + 1)}
+          disabled={currentSection === TOTAL_SECTIONS - 1}
+          className={cn(
+            "flex items-center justify-center w-10 h-10 rounded-full border-2 backdrop-blur-sm transition-all",
+            currentSection === TOTAL_SECTIONS - 1
+              ? "border-white/10 bg-white/5 text-white/20 cursor-not-allowed"
+              : "border-white/30 bg-white/10 text-white hover:bg-white/20 hover:border-white/50"
+          )}
+        >
+          <Icon name="ChevronRight" size={18} />
+        </button>
+      </div>
+
+      {/* Название текущего слайда */}
+      <div className="fixed bottom-[4.5rem] left-1/2 -translate-x-1/2 z-50">
+        <span className="text-xs text-white/40 font-open-sans-custom tracking-wider">
+          {currentSection + 1} / {TOTAL_SECTIONS} — {SECTION_TITLES[currentSection]}
+        </span>
       </div>
     </main>
   )
